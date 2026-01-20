@@ -1,0 +1,8 @@
+name: code_executor
+description: Agent that executes code in sandbox
+environment: python-basic
+tools:
+  - python_exec
+capabilities:
+  - code_execution
+  - file_operations

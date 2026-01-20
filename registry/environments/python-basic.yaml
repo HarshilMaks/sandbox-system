@@ -1,0 +1,10 @@
+name: python-basic
+description: Basic Python environment
+image: sandbox-python:latest
+resources:
+  memory: 512Mi
+  cpu: 0.5
+mounts:
+  - /sandbox_runtime:/sandbox
+environment:
+  PYTHONPATH: /sandbox/workspace
