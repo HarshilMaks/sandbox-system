@@ -48,7 +48,8 @@ async def run_conversation_agent():
     
     # Initialize providers
     gemini_provider = GeminiProvider(
-        api_key=os.getenv("GEMINI_API_KEY")
+        api_key=os.getenv("GEMINI_API_KEY"),
+        model=os.getenv("GEMINI_MODEL")
     )
     
     e2b_provider = E2BProvider(
@@ -67,7 +68,7 @@ async def run_conversation_agent():
     # Create agent
     config = AgentConfig(
         name="ConversationalAgent",
-        model="gemini-2.0-flash-exp",
+        model=os.getenv("GEMINI_MODEL", "gemini-1.5-flash"),
         temperature=0.7,
         system_prompt=SYSTEM_PROMPT,
         tools_enabled=True,

@@ -33,16 +33,14 @@ class E2BProvider:
         """
         self.logger.info(f"Creating sandbox for session {session_id}")
         
-        sandbox = Sandbox.create(
-            template=template,
-            metadata={"session_id": session_id},
+        sandbox = Sandbox(
             api_key=self.api_key
         )
         
         self.sandboxes[session_id] = sandbox
-        self.logger.info(f"Sandbox created: {sandbox.id}")
+        self.logger.info(f"Sandbox created: {sandbox.sandbox_id}")
         
-        return sandbox.id
+        return sandbox.sandbox_id
     
     def get_sandbox(self, session_id: str) -> Optional[Sandbox]:
         """Get existing sandbox."""
@@ -132,8 +130,11 @@ class E2BProvider:
         """Close sandbox."""
         sandbox = self.sandboxes.pop(session_id, None)
         if sandbox:
-            sandbox.close()
-            self.logger.info(f"Closed sandbox for session {session_id}")
+            try:
+                sandbox.kill()
+                self.logger.info(f"Closed sandbox for session {session_id}")
+            except Exception as e:
+                self.logger.warning(f"Error closing sandbox {session_id}: {e}")
     
     def cleanup_all(self):
         """Close all sandboxes."""

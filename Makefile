@@ -28,7 +28,7 @@ setup: install verify
 
 verify:
 	@echo "Verifying system..."
-	python verify.py
+	python scripts/verify.py
 
 run:
 	@echo "Starting conversational agent..."
@@ -40,7 +40,15 @@ tasks:
 
 map:
 	@echo "Generating connection map..."
-	python map_connections.py
+	python scripts/map_connections.py
+
+list-models:
+	@echo "Listing available Gemini models..."
+	python scripts/list_models.py
+
+cleanup-sandboxes:
+	@echo "Cleaning up all E2B sandboxes..."
+	python scripts/cleanup_sandboxes.py
 
 clean:
 	@echo "Cleaning up..."

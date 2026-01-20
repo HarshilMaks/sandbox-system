@@ -69,7 +69,8 @@ cp .env.example .env
 ### 4. Verify Installation
 
 ```bash
-python verify.py
+make verify
+# or: python scripts/verify.py
 ```
 
 All checks should pass. If any fail, ensure dependencies are installed.
@@ -117,21 +118,55 @@ response = await agent.run(
 print(response.content)
 ```
 
-See [docs/e2b_guide.md](docs/e2b_guide.md) for E2B setup and [ARCHITECTURE.md](ARCHITECTURE.md) for system design.
+See [docs/e2b_guide.md](docs/e2b_guide.md) for E2B setup and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for system design.
+
+## Quick Commands
+
+```bash
+make run              # Start conversational agent
+make verify           # Verify all imports
+make map              # Generate connection map
+make list-models      # List available Gemini models
+make cleanup-sandboxes # Clean up E2B sandboxes
+make clean            # Clean Python cache files
+```
+
+## Project Structure
+
+```
+sandbox-system/
+├── main.py                     # Main conversational agent
+├── scripts/                    # Utility scripts
+│   ├── cleanup_sandboxes.py   # E2B sandbox cleanup
+│   ├── list_models.py         # List Gemini models
+│   ├── verify.py              # Import verification
+│   └── map_connections.py     # Connection mapper
+├── docs/                       # Documentation
+│   ├── ARCHITECTURE.md        # System architecture
+│   └── e2b_guide.md          # E2B integration guide
+├── orchestrator/              # Core system
+│   ├── core/                  # Agent engine
+│   ├── providers/             # Gemini + E2B providers
+│   ├── tools/                 # Tool execution
+│   └── utils/                 # Utilities
+├── registry/tools/            # Tool definitions (YAML)
+├── storage/                   # Persistent storage
+├── requirements.txt           # Dependencies
+├── pyproject.toml            # Package config
+├── Makefile                  # Quick commands
+└── .env                      # API keys (not committed)
+```
 
 ## Documentation
 
-- **[Architecture](docs/architecture.md)** - System design and flow
-- **[E2B Guide](docs/e2b_guide.md)** - Setup and configuration  
-- **[E2B Examples](docs/e2b_examples.md)** - Code examples
+- **[ARCHITECTURE](docs/ARCHITECTURE.md)** - System design and architecture
+- **[E2B Guide](docs/e2b_guide.md)** - E2B integration details
 
-## Structure
+## Migration
 
-- `docker/` - Sandbox environment images
-- `registry/` - Declarative configs (NO logic)
-- `orchestrator/` - Session and sandbox lifecycle management
-- `api/` - Control surface for external systems
-- `storage/` - Persistent storage (OUTSIDE sandbox)
-- `sandbox_runtime/` - Execution environment (INSIDE sandbox)
-- `docs/` - Documentation
-- `pyproject.toml` - Package configuration (UV)
+This system was migrated to Google Gemini. All code has been updated:
+- ✅ Full Gemini API integration (google-genai>=1.0.0)
+- ✅ E2B Code Interpreter 1.0.0
+- ✅ Tool calling and function execution
+- ✅ Sandbox lifecycle management
+- ✅ Production-ready error handling

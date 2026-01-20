@@ -12,21 +12,24 @@ from orchestrator.utils.retry import with_retry
 class GeminiProvider:
     """Production Gemini provider with async support."""
     
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         """Initialize Gemini client.
         
         Args:
             api_key: Gemini API key (or use GEMINI_API_KEY env var)
+            model: Gemini model name (or use GEMINI_MODEL env var)
         """
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
+        self.model = model or os.getenv("GEMINI_MODEL", "gemini-2.0-flash-exp")
         self.client = genai.Client(api_key=self.api_key)
         self.logger = get_logger("provider.gemini")
+        self.logger.info(f"Initialized Gemini with model: {self.model}")
     
     @with_retry(max_attempts=3, exponential_backoff=True)
     async def chat_completion(
         self,
         messages: List[Dict],
-        model: str = "gemini-2.0-flash-exp",
+        model: Optional[str] = None,
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
         tools: Optional[List[Dict]] = None,
@@ -36,7 +39,7 @@ class GeminiProvider:
         
         Args:
             messages: Conversation messages
-            model: Model name (gemini-2.0-flash-exp, gemini-1.5-pro, etc.)
+            model: Model name (defaults to instance model from env/init)
             temperature: Sampling temperature
             max_tokens: Max tokens to generate
             tools: Function calling tools
@@ -45,26 +48,33 @@ class GeminiProvider:
         Returns:
             Response dict with content, tool_calls, usage
         """
-        self.logger.info(f"Chat completion: model={model}, messages={len(messages)}")
+        # Use instance model if not provided
+        model = model or self.model
         
-        # Setup generation config
-        config = GenerateContentConfig(
-            temperature=temperature,
-            max_output_tokens=max_tokens or 8192,
-        )
+        self.logger.info(f"Chat completion: model={model}, messages={len(messages)}")
         
         # Convert tools to Gemini format
         gemini_tools = None
         if tools:
             gemini_tools = [self._convert_tools(tools)]
         
+        # Setup generation config
+        config_params = {
+            "temperature": temperature,
+            "max_output_tokens": max_tokens or 8192,
+        }
+        
+        if gemini_tools:
+            config_params["tools"] = gemini_tools
+        
+        config = GenerateContentConfig(**config_params)
+        
         # Generate response
         try:
             response = self.client.models.generate_content(
                 model=model,
-                contents=messages[-1]["content"],  # Use last message
-                config=config,
-                tools=gemini_tools
+                contents=messages[-1]["content"],
+                config=config
             )
             
             result = {
