@@ -34,8 +34,7 @@ sandbox-system/
 │       ├── retry.py          # Retry logic (independent)
 │       └── streaming.py      # Stream utilities (independent)
 │
-├── examples/
-│   └── conversational_agent.py  # Production example (imports: all core + providers + tools)
+├── main.py                  # Production agent runner (imports: all core + providers + tools)
 │
 ├── registry/                 # Tool definitions
 │   └── tools.yaml           # YAML tool schemas
@@ -70,12 +69,12 @@ sandbox-system/
 - `core/agent.py` → gemini, conversation, memory, executor, logging, retry
 
 ### Application Layer
-- `examples/conversational_agent.py` → agent, memory, gemini, e2b, executor, logging
+- `main.py` → agent, memory, gemini, e2b, executor, logging
 
 ## Import Graph
 
 ```
-examples/conversational_agent.py
+main.py
   ↓
 orchestrator.core.agent
   ↓ ↓ ↓ ↓
@@ -185,7 +184,7 @@ The following files were removed as they're not used by the current system:
 
 All Python files compile successfully without import errors:
 ```bash
-python -m py_compile examples/conversational_agent.py \
+python -m py_compile main.py \
   orchestrator/core/agent.py \
   orchestrator/providers/gemini.py \
   orchestrator/providers/e2b.py \
@@ -197,6 +196,6 @@ python -m py_compile examples/conversational_agent.py \
 
 1. **Install dependencies**: `uv pip install -r requirements.txt`
 2. **Configure environment**: Copy `.env.example` to `.env` and add your API keys
-3. **Run example**: `python examples/conversational_agent.py`
+3. **Run agent**: `python main.py`
 4. **Test with E2B**: Ensure E2B API key is valid and sandbox creation works
 5. **Test Gemini**: Ensure Gemini API key works with the new provider

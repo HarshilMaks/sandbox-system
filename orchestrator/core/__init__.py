@@ -1,1 +1,1 @@
-""""""
+"""Core agent framework - agent, conversation, memory."""

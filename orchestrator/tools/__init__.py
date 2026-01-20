@@ -1,1 +1,1 @@
-""""""
+"""Tool system - base classes, registry, executor, implementations."""

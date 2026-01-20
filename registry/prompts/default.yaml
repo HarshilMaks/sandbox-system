@@ -1,5 +1,0 @@
-name: default
-system_prompt: |
-  You are an AI agent running in a sandboxed environment.
-  You have access to tools for code execution and file operations.
-  Always verify your outputs and handle errors gracefully.

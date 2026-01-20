@@ -1,35 +1,29 @@
 [project]
 name = "sandbox-system"
-version = "0.1.0"
-description = "Stateful Sandbox System for Running AI Agents"
+version = "1.0.0"
+description = "AI Agent System with Gemini and E2B Sandboxes"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "fastapi==0.109.0",
-    "uvicorn[standard]==0.27.0",
-    "docker==7.0.0",
+    "google-genai>=1.0.0",
     "e2b-code-interpreter==1.0.0",
     "python-dotenv==1.0.0",
-    "pydantic==2.5.3",
     "pyyaml==6.0.1",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest==7.4.4",
-    "black==24.1.1",
-    "flake8==7.0.0",
-    "pytest-asyncio",
-    "httpx",
+    "pytest>=7.4.0",
+    "ruff>=0.1.0",
 ]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.black]
+[tool.ruff]
 line-length = 100
-target-version = ['py310']
+target-version = "py310"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

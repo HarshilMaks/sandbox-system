@@ -49,7 +49,7 @@ def main():
         ("orchestrator.utils.streaming", "Utils: Streaming"),
         
         # Examples
-        ("examples.conversational_agent", "Example: Conversational Agent"),
+        ("main", "Main: Agent Runner"),
     ]
     
     results = []
@@ -72,7 +72,7 @@ def main():
         print("   - E2B_API_KEY (get from https://e2b.dev)")
         print()
         print("2. Run the example:")
-        print("   python examples/conversational_agent.py")
+        print("   python main.py")
         return 0
     else:
         print(f"❌ {success_count}/{total_count} imports successful")

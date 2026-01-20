@@ -78,10 +78,10 @@ All checks should pass. If any fail, ensure dependencies are installed.
 
 ```bash
 # Interactive conversation
-python examples/conversational_agent.py
+python main.py
 
 # Run predefined tasks
-python examples/conversational_agent.py tasks
+python main.py tasks
 ```
 
 ## Example Usage
@@ -117,7 +117,7 @@ response = await agent.run(
 print(response.content)
 ```
 
-See [UV_GUIDE.md](docs/UV_GUIDE.md) for detailed UV usage.
+See [docs/e2b_guide.md](docs/e2b_guide.md) for E2B setup and [ARCHITECTURE.md](ARCHITECTURE.md) for system design.
 
 ## Documentation
 
