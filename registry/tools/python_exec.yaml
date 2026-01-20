@@ -1,5 +1,0 @@
-name: python_exec
-description: Execute Python code in sandbox
-script: /sandbox/tools/python_exec.sh
-timeout: 30
-allow_network: false

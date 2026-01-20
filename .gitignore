@@ -21,11 +21,15 @@ wheels/
 *.egg
 MANIFEST
 
-# Virtual Environment
+# Virtual Environment (UV and pip)
 venv/
 env/
 ENV/
+.venv/
 .venv
+
+# UV cache
+.uv/
 
 # IDE
 .vscode/
@@ -41,22 +45,11 @@ logs/
 sandbox_runtime/logs/*.log
 !sandbox_runtime/logs/.gitkeep
 
-# Storage (persistent session data)
-storage/sessions/*/
-storage/artifacts/*/
-!storage/sessions/session_<id>/
-!storage/artifacts/session_<id>/
+# Storage (persistent session data - auto-created at runtime)
+storage/
 
-# Sandbox Runtime (generated at runtime - Docker only)
-# For E2B deployments, this entire directory is optional
-sandbox_runtime/agent/state.json
-sandbox_runtime/agent/memory.json
-sandbox_runtime/workspace/src/*
-sandbox_runtime/workspace/data/*
-sandbox_runtime/workspace/outputs/*
-sandbox_runtime/workspace/tmp/*
-sandbox_runtime/meta/session.json
-!sandbox_runtime/**/.gitkeep
+# Sandbox Runtime (Docker only - not needed for E2B)
+sandbox_runtime/
 
 # Server process
 server.log

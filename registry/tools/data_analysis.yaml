@@ -1,0 +1,32 @@
+name: data_analysis
+description: Perform data analysis on CSV files with pandas
+type: data_analysis
+parameters:
+  type: object
+  properties:
+    analysis_type:
+      type: string
+      description: Type of analysis (summary, visualize, correlate)
+      enum:
+        - summary
+        - visualize
+        - correlate
+    data_path:
+      type: string
+      description: Path to CSV file
+    columns:
+      type: array
+      description: Optional list of columns to analyze
+      items:
+        type: string
+  required:
+    - analysis_type
+    - data_path
+examples:
+  - analysis_type: summary
+    data_path: /data/train.csv
+  - analysis_type: visualize
+    data_path: /data/train.csv
+    columns: ["age", "fare"]
+  - analysis_type: correlate
+    data_path: /data/train.csv

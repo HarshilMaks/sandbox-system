@@ -1,0 +1,30 @@
+name: file_operations
+description: Read, write, list files in E2B sandbox filesystem
+type: file_operations
+parameters:
+  type: object
+  properties:
+    operation:
+      type: string
+      description: Operation to perform (read, write, list)
+      enum:
+        - read
+        - write
+        - list
+    path:
+      type: string
+      description: File or directory path
+    content:
+      type: string
+      description: Content to write (required for write operation)
+  required:
+    - operation
+    - path
+examples:
+  - operation: write
+    path: /data/train.csv
+    content: "id,value\n1,100\n2,200"
+  - operation: read
+    path: /data/train.csv
+  - operation: list
+    path: /data

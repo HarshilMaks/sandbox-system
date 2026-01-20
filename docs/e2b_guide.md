@@ -18,9 +18,13 @@
    E2B_API_KEY=your_api_key_here
    ```
 
-3. **Install E2B SDK**
+3. **Install Dependencies**
    ```bash
-   pip install e2b-code-interpreter
+   # Using uv (recommended)
+   uv pip install -e .
+   
+   # Or install just E2B SDK
+   uv pip install e2b-code-interpreter
    ```
 
 ## Usage

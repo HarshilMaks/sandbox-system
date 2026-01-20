@@ -1,0 +1,42 @@
+name: ml_trainer
+description: Train machine learning models on data with scikit-learn
+type: ml_training
+parameters:
+  type: object
+  properties:
+    model_type:
+      type: string
+      description: Type of model (decision_tree, random_forest, logistic_regression)
+      enum:
+        - decision_tree
+        - random_forest
+        - logistic_regression
+        - gradient_boosting
+    data_path:
+      type: string
+      description: Path to training CSV file
+    target_column:
+      type: string
+      description: Name of target/label column
+    feature_columns:
+      type: array
+      description: List of feature column names
+      items:
+        type: string
+    test_size:
+      type: number
+      description: Proportion for test split (0.0-1.0)
+      default: 0.2
+  required:
+    - model_type
+    - data_path
+    - target_column
+examples:
+  - model_type: decision_tree
+    data_path: /data/train.csv
+    target_column: survived
+    feature_columns: ["age", "fare", "pclass"]
+  - model_type: random_forest
+    data_path: /data/train.csv
+    target_column: survived
+    test_size: 0.3

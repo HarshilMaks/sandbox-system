@@ -1,0 +1,25 @@
+name: execute_python
+description: Execute Python code in E2B sandbox with full access to installed packages
+type: code_execution
+parameters:
+  type: object
+  properties:
+    code:
+      type: string
+      description: Python code to execute
+    language:
+      type: string
+      description: Programming language (default python)
+      default: python
+  required:
+    - code
+examples:
+  - code: "import pandas as pd; df = pd.read_csv('/data.csv'); print(df.head())"
+  - code: "import matplotlib.pyplot as plt; plt.plot([1,2,3]); plt.savefig('/output.png')"
+capabilities:
+  - pandas
+  - numpy
+  - matplotlib
+  - scikit-learn
+  - data_visualization
+  - file_io
