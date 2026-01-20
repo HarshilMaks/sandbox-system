@@ -17,7 +17,7 @@ Agent intelligence, reasoning, and orchestration happen OUTSIDE this system.
 
 ### Registry
 Declarative YAML configs with NO logic:
-- Environments
+- Environments (Docker + E2B)
 - Agents
 - Tools
 - Prompts
@@ -25,9 +25,10 @@ Declarative YAML configs with NO logic:
 ### Orchestrator
 The brain of the system:
 - Session management
-- Sandbox lifecycle
+- Sandbox lifecycle (Docker + E2B)
 - State persistence
 - High-level flow control
+- Unified sandbox management
 
 ### API
 Control surface for external interaction:
@@ -42,8 +43,22 @@ Persistent storage OUTSIDE sandbox:
 - Logs
 
 ### Sandbox Runtime
-Mounted INSIDE sandbox:
+Mounted INSIDE sandbox (Docker) or accessed via API (E2B):
 - Agent state
 - Workspace
 - Tools
 - Logs
+
+### Sandbox Providers
+
+#### Docker (Local)
+- Self-hosted containers
+- Volume mounts for file access
+- Direct container control
+- Best for: Development, on-premise, high volume
+
+#### E2B (Cloud)
+- Managed cloud sandboxes
+- API-based file operations
+- Auto-scaling
+- Best for: SaaS, serverless, rapid deployment
