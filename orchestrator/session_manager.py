@@ -4,7 +4,11 @@ from pathlib import Path
 
 
 class SessionManager:
-    """Manages session creation and destruction."""
+    """Manages session creation and destruction.
+    
+    Sessions are isolated execution contexts with persistent storage.
+    This does NOT manage agent logic - only the execution environment.
+    """
     
     def __init__(self, storage_path: str):
         self.storage_path = Path(storage_path)

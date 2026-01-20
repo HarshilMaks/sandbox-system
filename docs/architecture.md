@@ -1,7 +1,17 @@
 # Architecture
 
 ## Overview
-The sandbox system provides isolated execution environments for AI agents with declarative configuration.
+A **Stateful Sandbox System** for running AI agents in isolated, managed environments.
+
+### Core Purpose
+This system is NOT an agent framework. It is infrastructure for:
+- Creating isolated execution environments
+- Managing session lifecycle and state
+- Executing code/tools safely
+- Storing logs and artifacts
+- Clean destruction of resources
+
+Agent intelligence, reasoning, and orchestration happen OUTSIDE this system.
 
 ## Components
 

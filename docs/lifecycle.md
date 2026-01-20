@@ -1,11 +1,14 @@
 # Lifecycle
 
+## Overview
+The sandbox system manages the complete lifecycle of isolated execution environments with persistent state.
+
 ## Session Creation
-1. Client requests session via API
-2. SessionManager creates session directory
-3. SandboxManager starts container
-4. StateManager initializes agent state
-5. Return session_id and container_id
+1. External system (agent controller) requests session via API
+2. SessionManager creates session directory in persistent storage
+3. SandboxManager starts isolated container with resource limits
+4. StateManager initializes empty agent state files
+5. Return session_id and container_id to external system
 
 ## Execution
 1. Agent reads state from sandbox_runtime/agent/

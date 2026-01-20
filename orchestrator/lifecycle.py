@@ -1,11 +1,14 @@
-"""High-level orchestration flow."""
+"""High-level orchestration flow for sandbox lifecycle."""
 from .session_manager import SessionManager
 from .sandbox_manager import SandboxManager
 from .state_manager import StateManager
 
 
 class Lifecycle:
-    """High-level orchestration of session and sandbox lifecycle."""
+    """Orchestrates sandbox system lifecycle: create, start, stop, destroy.
+    
+    This manages the execution environment only. Agent logic lives elsewhere.
+    """
     
     def __init__(self, storage_path: str, runtime_path: str):
         self.session_mgr = SessionManager(storage_path)

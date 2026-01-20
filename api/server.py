@@ -2,7 +2,10 @@
 from fastapi import FastAPI
 from .routes import session, sandbox
 
-app = FastAPI(title="Sandbox System API")
+app = FastAPI(
+    title="Stateful Sandbox System API",
+    description="Create, manage, and destroy isolated execution environments for AI agents"
+)
 
 app.include_router(session.router, prefix="/api/sessions", tags=["sessions"])
 app.include_router(sandbox.router, prefix="/api/sandbox", tags=["sandbox"])

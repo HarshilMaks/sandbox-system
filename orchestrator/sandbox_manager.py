@@ -3,7 +3,11 @@ import docker
 
 
 class SandboxManager:
-    """Manages sandbox container lifecycle."""
+    """Manages isolated container lifecycle for code execution.
+    
+    Provides secure, resource-controlled execution environments.
+    Agent code runs INSIDE these containers.
+    """
     
     def __init__(self):
         self.client = docker.from_env()

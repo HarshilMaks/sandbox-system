@@ -4,7 +4,11 @@ from pathlib import Path
 
 
 class StateManager:
-    """Manages agent state read/write operations."""
+    """Manages agent state read/write operations.
+    
+    Stores state, memory, and progress for external agent systems.
+    This is a state store only - not an agent runtime.
+    """
     
     def __init__(self, runtime_path: str):
         self.runtime_path = Path(runtime_path)
