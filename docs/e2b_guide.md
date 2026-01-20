@@ -76,13 +76,13 @@ POST /api/e2b/files
 
 ## When to Use E2B
 
-✅ **Use E2B when:**
+**Use E2B when:**
 - You don't want to manage Docker infrastructure
 - Need auto-scaling for multiple concurrent sessions
 - Want zero-setup deployment
 - Building a SaaS product
 
-❌ **Use Docker when:**
+**Use Docker when:**
 - Need complete control over infrastructure
 - Have specific networking requirements
 - Want offline execution

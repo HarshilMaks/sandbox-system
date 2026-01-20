@@ -47,7 +47,8 @@ storage/artifacts/*/
 !storage/sessions/session_<id>/
 !storage/artifacts/session_<id>/
 
-# Sandbox Runtime (generated at runtime)
+# Sandbox Runtime (generated at runtime - Docker only)
+# For E2B deployments, this entire directory is optional
 sandbox_runtime/agent/state.json
 sandbox_runtime/agent/memory.json
 sandbox_runtime/workspace/src/*
@@ -56,6 +57,10 @@ sandbox_runtime/workspace/outputs/*
 sandbox_runtime/workspace/tmp/*
 sandbox_runtime/meta/session.json
 !sandbox_runtime/**/.gitkeep
+
+# Server process
+server.log
+nohup.out
 
 # Docker
 .docker/

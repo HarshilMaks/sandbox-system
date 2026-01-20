@@ -4,23 +4,17 @@ A containerized sandbox system that provides isolated execution environments for
 
 ## What This System Does
 
-**Creates isolated execution environments (sandbox)** - Containerized workspaces with controlled resources
-
-**Maintains session state** - Persistent agent state, memory, and progress tracking
-
-**Allows code/tool execution** - Secure execution of code and tools within sandbox boundaries
-
-**Stores logs & artifacts** - Complete audit trail and output preservation
-
-**Destroys everything cleanly** - Full lifecycle management with proper cleanup
+- **Creates isolated execution environments (sandbox)** - Containerized workspaces with controlled resources
+- **Maintains session state** - Persistent agent state, memory, and progress tracking
+- **Allows code/tool execution** - Secure execution of code and tools within sandbox boundaries
+- **Stores logs & artifacts** - Complete audit trail and output preservation
+- **Destroys everything cleanly** - Full lifecycle management with proper cleanup
 
 ## What This System Does NOT Do
 
-Agent intelligence or reasoning
-
-Multi-agent orchestration or debates
-
-Agent prompt engineering or optimization
+- Agent intelligence or reasoning
+- Multi-agent orchestration or debates
+- Agent prompt engineering or optimization
 
 > **This is a sandbox execution platform, not an agent framework.**
 

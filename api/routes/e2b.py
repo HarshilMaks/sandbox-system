@@ -1,8 +1,14 @@
 """E2B sandbox routes."""
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+import os
+import base64
+from orchestrator.unified_manager import UnifiedSandboxManager
 
 router = APIRouter()
+
+# Initialize E2B manager
+manager = UnifiedSandboxManager(e2b_api_key=os.getenv("E2B_API_KEY"))
 
 
 class CodeExecutionRequest(BaseModel):
@@ -27,14 +33,15 @@ def execute_code(request: CodeExecutionRequest):
     Returns:
         Execution results with stdout, stderr, artifacts
     """
-    # Implementation would call UnifiedSandboxManager.execute_code()
-    return {
-        "stdout": "Hello from E2B",
-        "stderr": "",
-        "error": None,
-        "results": [],
-        "artifacts": []
-    }
+    try:
+        result = manager.execute_code(
+            session_id=request.session_id,
+            code=request.code,
+            language=request.language
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/files/{session_id}")
@@ -48,12 +55,19 @@ def list_files(session_id: str, directory: str = "/"):
     Returns:
         List of files
     """
-    # Implementation would call E2BSandboxManager.list_files()
-    return {
-        "session_id": session_id,
-        "directory": directory,
-        "files": ["example.py", "data.csv"]
-    }
+    try:
+        provider = manager.get_provider(session_id)
+        if provider != "e2b":
+            raise HTTPException(status_code=400, detail="Only E2B sessions support file listing")
+        
+        files = manager.e2b_manager.list_files(session_id, directory)
+        return {
+            "session_id": session_id,
+            "directory": directory,
+            "files": files
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/files/{session_id}/{file_path:path}")
@@ -67,12 +81,20 @@ def read_file(session_id: str, file_path: str):
     Returns:
         File contents
     """
-    # Implementation would call E2BSandboxManager.read_file()
-    return {
-        "session_id": session_id,
-        "file_path": file_path,
-        "content": "# File content here"
-    }
+    try:
+        provider = manager.get_provider(session_id)
+        if provider != "e2b":
+            raise HTTPException(status_code=400, detail="Only E2B sessions support file reading")
+        
+        content = manager.e2b_manager.read_file(session_id, file_path)
+        return {
+            "session_id": session_id,
+            "file_path": file_path,
+            "content": base64.b64encode(content).decode('utf-8'),
+            "encoding": "base64"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/files")
@@ -85,11 +107,21 @@ def write_file(request: FileUploadRequest):
     Returns:
         Success status
     """
-    # Implementation would call E2BSandboxManager.write_file()
-    return {
-        "status": "success",
-        "file_path": request.file_path
-    }
+    try:
+        provider = manager.get_provider(request.session_id)
+        if provider != "e2b":
+            raise HTTPException(status_code=400, detail="Only E2B sessions support file writing")
+        
+        # Decode base64 content
+        content = base64.b64decode(request.content)
+        manager.e2b_manager.write_file(request.session_id, request.file_path, content)
+        
+        return {
+            "status": "success",
+            "file_path": request.file_path
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/url/{session_id}")
@@ -102,8 +134,15 @@ def get_sandbox_url(session_id: str):
     Returns:
         Sandbox URL
     """
-    # Implementation would call E2BSandboxManager.get_sandbox_url()
-    return {
-        "session_id": session_id,
-        "url": "https://sandbox-xyz.e2b.dev"
-    }
+    try:
+        provider = manager.get_provider(session_id)
+        if provider != "e2b":
+            raise HTTPException(status_code=400, detail="Only E2B sessions have URLs")
+        
+        url = manager.e2b_manager.get_sandbox_url(session_id)
+        return {
+            "session_id": session_id,
+            "url": url
+        }
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
