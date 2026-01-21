@@ -148,6 +148,10 @@ User Output
 **Imports**: `e2b_code_interpreter`, utils  
 **Provides**: `E2BProvider` with sandbox lifecycle & code execution
 
+**Custom Template**: `en7sb4k1n268scs49jnj` with pre-installed packages:
+- numpy (1.26.4), pandas (2.2.3), scikit-learn (1.6.1), matplotlib (3.10.3)
+- requests, beautifulsoup4
+
 ### orchestrator/tools/executor.py
 **Purpose**: Tool execution orchestration  
 **Imports**: registry, implementations, e2b, logging  

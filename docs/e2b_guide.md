@@ -20,24 +20,71 @@
 
 3. **Install Dependencies**
    ```bash
-   # Using uv (recommended)
-   uv pip install -e .
-   
-   # Or install just E2B SDK
-   uv pip install e2b-code-interpreter
+   pip install e2b-code-interpreter
    ```
 
-## Usage
+## Quick Usage
 
-### Create E2B Session
-```bash
-POST /api/sessions
-{
-  "agent": "code_executor",
-  "environment": "e2b-python",
-  "provider": "e2b"
-}
+### Default Template
+```python
+from e2b_code_interpreter import Sandbox
+
+sandbox = Sandbox(api_key=api_key)
+result = sandbox.run_code("print('Hello from E2B!')")
+print(result.logs.stdout)
+sandbox.kill()
 ```
+
+### Custom Template (with pre-installed packages)
+```python
+from e2b_code_interpreter import Sandbox
+
+# Use our custom template with numpy, pandas, sklearn, etc.
+sandbox = Sandbox(
+    template="en7sb4k1n268scs49jnj",
+    api_key=api_key
+)
+
+result = sandbox.run_code("""
+import numpy as np
+import pandas as pd
+print(f"NumPy: {np.__version__}")
+print(f"Pandas: {pd.__version__}")
+""")
+print(result.logs.stdout)
+sandbox.kill()
+```
+
+## Custom Template
+
+### Pre-installed Packages
+Template ID: `en7sb4k1n268scs49jnj`
+- numpy (1.26.4)
+- pandas (2.2.3)
+- scikit-learn (1.6.1)
+- matplotlib (3.10.3)
+- requests
+- beautifulsoup4
+
+### Build Your Own Template
+
+1. **Edit Dockerfile** - Add your packages:
+   ```dockerfile
+   FROM e2bdev/code-interpreter:latest
+   RUN pip install --no-cache-dir your-packages
+   ```
+
+2. **Build with start command** (CRITICAL!):
+   ```bash
+   e2b template build -c "/root/.jupyter/start-up.sh"
+   ```
+
+3. **Use the template**:
+   ```python
+   sandbox = Sandbox(template="your-new-template-id")
+   ```
+
+## API Endpoints
 
 ### Execute Code
 ```bash
@@ -56,47 +103,13 @@ GET /api/e2b/files/abc-123?directory=/workspace
 
 # Read file
 GET /api/e2b/files/abc-123/output.txt
-
-# Write file
-POST /api/e2b/files
-{
-  "session_id": "abc-123",
-  "file_path": "/workspace/data.csv",
-  "content": "base64_encoded_content"
-}
 ```
-
-## E2B vs Docker
-
-| Feature | Docker | E2B |
-|---------|--------|-----|
-| **Deployment** | Self-hosted | Cloud-hosted |
-| **Setup** | Docker daemon required | API key only |
-| **Scaling** | Manual | Automatic |
-| **Networking** | Local | Global CDN |
-| **Pricing** | Free (infrastructure cost) | Usage-based |
-| **File Persistence** | Volume mounts | API-based |
-| **Latency** | Low (local) | Network-dependent |
-
-## When to Use E2B
-
-**Use E2B when:**
-- You don't want to manage Docker infrastructure
-- Need auto-scaling for multiple concurrent sessions
-- Want zero-setup deployment
-- Building a SaaS product
-
-**Use Docker when:**
-- Need complete control over infrastructure
-- Have specific networking requirements
-- Want offline execution
-- Cost-sensitive for high volume
 
 ## E2B Templates
 
-Available templates:
-- `Python3` - Python 3.11 with common packages
-- `Node` - Node.js environment
-- `Bash` - Linux shell environment
+| Template | Description |
+|----------|-------------|
+| Default | Python 3.12, basic packages |
+| `en7sb4k1n268scs49jnj` | Python 3.12 + numpy, pandas, sklearn, matplotlib |
 
 Custom templates can be created via E2B dashboard.

@@ -21,21 +21,31 @@ class E2BProvider:
         self.sandboxes: Dict[str, Sandbox] = {}
     
     @with_retry(max_attempts=2)
-    def create_sandbox(self, session_id: str, template: str = "Python3") -> str:
+    def create_sandbox(self, session_id: str, template: Optional[str] = None) -> str:
         """Create E2B sandbox.
         
         Args:
             session_id: Session identifier
-            template: E2B template
+            template: E2B template ID (optional, uses default if not specified)
+                     For custom templates, use the template ID from e2b template build
             
         Returns:
             Sandbox ID
         """
         self.logger.info(f"Creating sandbox for session {session_id}")
         
-        sandbox = Sandbox(
-            api_key=self.api_key
-        )
+        # Create sandbox with optional template
+        if template:
+            self.logger.info(f"Using custom template: {template}")
+            sandbox = Sandbox(
+                template=template,
+                api_key=self.api_key
+            )
+        else:
+            self.logger.info("Using default E2B template")
+            sandbox = Sandbox(
+                api_key=self.api_key
+            )
         
         self.sandboxes[session_id] = sandbox
         self.logger.info(f"Sandbox created: {sandbox.sandbox_id}")

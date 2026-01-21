@@ -1,0 +1,23 @@
+# E2B Custom Template Configuration
+# ==================================
+#
+# Template ID: en7sb4k1n268scs49jnj
+#
+# USAGE (Python):
+#   from e2b_code_interpreter import Sandbox
+#   sandbox = Sandbox(template="en7sb4k1n268scs49jnj", api_key=api_key)
+#   result = sandbox.run_code("import numpy; print(numpy.__version__)")
+#
+# PRE-INSTALLED PACKAGES:
+#   - numpy, pandas, matplotlib, scikit-learn, requests, beautifulsoup4
+#
+# BUILD COMMAND:
+#   e2b template build -c "/root/.jupyter/start-up.sh"
+
+team_id = "19d98cfb-4b72-4361-96ca-50fb31a1b8de"
+dockerfile = "Dockerfile"
+template_id = "en7sb4k1n268scs49jnj"
+
+# CRITICAL: This starts the Jupyter kernel server on port 49999
+# Without this, run_code() will fail with timeout error
+start_cmd = "/root/.jupyter/start-up.sh"

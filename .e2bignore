@@ -1,0 +1,40 @@
+# E2B Ignore File
+# Files/directories to exclude when building E2B template
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Storage
+storage/
+
+# Git
+.git/
+.gitignore
+
+# Environment
+.env
+.env.local
+
+# Documentation (unless you want it in sandbox)
+docs/
+
+# Tests (unless you want them)
+tests/
+pytest_cache/

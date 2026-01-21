@@ -8,6 +8,7 @@ A **production-grade conversational AI agent system** with LLM integration, tool
 - **LLM Integration**: Google Gemini with async support, streaming, and retry logic
 - **Tool System**: Extensible tool framework with built-in tools (code execution, file ops, data analysis)
 - **E2B Sandboxes**: Secure cloud execution environments for code
+- **Custom Docker Images**: Build and publish custom sandbox environments with pre-installed dependencies
 - **Conversation Memory**: Persistent conversation history and context
 - **Error Handling**: Retry logic with exponential backoff
 - **Observability**: Structured logging and metrics
@@ -140,17 +141,24 @@ sandbox-system/
 │   ├── cleanup_sandboxes.py   # E2B sandbox cleanup
 │   ├── list_models.py         # List Gemini models
 │   ├── verify.py              # Import verification
-│   └── map_connections.py     # Connection mapper
+│   ├── map_connections.py     # Connection mapper
+│   ├── build_e2b_template.sh  # Build custom E2B templates
+│   └── custom_template.py     # Test custom templates
 ├── docs/                       # Documentation
-│   ├── ARCHITECTURE.md        # System architecture
-│   └── e2b_guide.md          # E2B integration guide
+│   ├── ARCHITECTURE.md         # System architecture
+│   ├── e2b_guide.md           # E2B integration basics
+│   └── E2B_CUSTOM_TEMPLATES.md # Custom Docker template guide
 ├── orchestrator/              # Core system
 │   ├── core/                  # Agent engine
 │   ├── providers/             # Gemini + E2B providers
+│   │   ├── gemini.py
+│   │   └── e2b.py
 │   ├── tools/                 # Tool execution
 │   └── utils/                 # Utilities
 ├── registry/tools/            # Tool definitions (YAML)
 ├── storage/                   # Persistent storage
+├── Dockerfile                 # Custom sandbox image
+├── e2b.toml                   # E2B template config
 ├── requirements.txt           # Dependencies
 ├── pyproject.toml            # Package config
 ├── Makefile                  # Quick commands
@@ -159,8 +167,27 @@ sandbox-system/
 
 ## Documentation
 
-- **[ARCHITECTURE](docs/ARCHITECTURE.md)** - System design and architecture
-- **[E2B Guide](docs/e2b_guide.md)** - E2B integration details
+- **[E2B_CUSTOM_TEMPLATES.md](docs/E2B_CUSTOM_TEMPLATES.md)** - 🚀 Build custom Docker templates
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design and architecture
+- **[e2b_guide.md](docs/e2b_guide.md)** - E2B integration and usage
+
+## Custom Docker Images 🐳
+
+Build custom E2B sandboxes with pre-installed dependencies:
+
+**Current Template ID**: `en7sb4k1n268scs49jnj`
+
+Pre-installed packages:
+- numpy (1.26.4), pandas (2.2.3), scikit-learn (1.6.1), matplotlib (3.10.3)
+- requests, beautifulsoup4
+
+**Build Your Own**:
+```bash
+# Edit Dockerfile, then build with the start command (CRITICAL!)
+e2b template build -c "/root/.jupyter/start-up.sh"
+```
+
+Read the complete guide: [E2B_CUSTOM_TEMPLATES.md](docs/E2B_CUSTOM_TEMPLATES.md)
 
 ## Migration
 
@@ -170,3 +197,4 @@ This system was migrated to Google Gemini. All code has been updated:
 - ✅ Tool calling and function execution
 - ✅ Sandbox lifecycle management
 - ✅ Production-ready error handling
+- ✅ Custom Docker image support
