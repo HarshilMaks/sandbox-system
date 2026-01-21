@@ -1,8 +1,8 @@
 """Production-grade conversational AI agent example."""
 import os
 import asyncio
+
 from dotenv import load_dotenv
-load_dotenv()
 
 from orchestrator.core.agent import Agent, AgentConfig
 from orchestrator.core.memory import MemoryStore
@@ -10,6 +10,9 @@ from orchestrator.providers.gemini import GeminiProvider
 from orchestrator.providers.e2b import E2BProvider
 from orchestrator.tools.executor import ToolExecutor
 from orchestrator.utils.logging import setup_logging, get_logger
+
+# Load environment variables
+load_dotenv()
 
 # Setup logging
 setup_logging(log_level="INFO", log_file="./logs/agent.log")

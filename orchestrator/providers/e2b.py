@@ -20,30 +20,32 @@ class E2BProvider:
         self.logger = get_logger("provider.e2b")
         self.sandboxes: Dict[str, Sandbox] = {}
     
+    # Custom template with pre-installed packages (numpy, pandas, sklearn, matplotlib)
+    DEFAULT_TEMPLATE = "en7sb4k1n268scs49jnj"
+    
     @with_retry(max_attempts=2)
     def create_sandbox(self, session_id: str, template: Optional[str] = None) -> str:
         """Create E2B sandbox.
         
         Args:
             session_id: Session identifier
-            template: E2B template ID (optional, uses default if not specified)
-                     For custom templates, use the template ID from e2b template build
+            template: E2B template ID (optional, uses custom template with pre-installed packages)
+                     Set to "default" to use E2B's basic template without packages
             
         Returns:
             Sandbox ID
         """
         self.logger.info(f"Creating sandbox for session {session_id}")
         
-        # Create sandbox with optional template
-        if template:
+        # Use custom template by default (has numpy, pandas, sklearn, matplotlib pre-installed)
+        if template == "default":
+            self.logger.info("Using default E2B template (no pre-installed packages)")
+            sandbox = Sandbox(api_key=self.api_key)
+        else:
+            template = template or self.DEFAULT_TEMPLATE
             self.logger.info(f"Using custom template: {template}")
             sandbox = Sandbox(
                 template=template,
-                api_key=self.api_key
-            )
-        else:
-            self.logger.info("Using default E2B template")
-            sandbox = Sandbox(
                 api_key=self.api_key
             )
         

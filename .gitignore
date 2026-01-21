@@ -79,3 +79,6 @@ temp/
 
 # OS
 Thumbs.db
+
+# Data volumes
+volumes/

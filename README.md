@@ -1,200 +1,180 @@
 # Production AI Agent System
 
-A **production-grade conversational AI agent system** with LLM integration, tool execution, and stateful conversation management.
+![Status](https://img.shields.io/badge/Status-Active-success)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Gemini](https://img.shields.io/badge/AI-Gemini%202.0-orange)
+![E2B](https://img.shields.io/badge/Sandbox-E2B-yellow)
 
-## Features
+> **A production-grade conversational AI agent that combines Google Gemini Pro with Secure Cloud Code Execution.**
 
-- **Core Agent Framework**: Production-ready agent with conversation management and memory
-- **LLM Integration**: Google Gemini with async support, streaming, and retry logic
-- **Tool System**: Extensible tool framework with built-in tools (code execution, file ops, data analysis)
-- **E2B Sandboxes**: Secure cloud execution environments for code
-- **Custom Docker Images**: Build and publish custom sandbox environments with pre-installed dependencies
-- **Conversation Memory**: Persistent conversation history and context
-- **Error Handling**: Retry logic with exponential backoff
-- **Observability**: Structured logging and metrics
+This system overcomes the limitations of traditional LLMs by giving them **tools** and a **body**. It doesn't just hallucinate code; it writes it, executes it in a secure, isolated cloud environment, and iterates on errors.
 
-## Architecture
+---
 
+## 🌟 Why is this different?
+
+Most AI agents are just chatbots. This system is a **Computational Agent**.
+
+| Feature | Standard Chatbot | ⚡ Our Agent System |
+| :--- | :--- | :--- |
+| **Code Execution** | ❌ None (or hallucinated) | ✅ **Real-time output** in E2B encryption sandboxes |
+| **Dependencies** | ❌ Limited to simple logic | ✅ **Full Data Science Stack** (Pandas, Scikit-learn) |
+| **Memory** | ❌ Context window only | ✅ **Persistent Session Memory** stored on disk |
+| **Speed** | 🐢 Slow setup per chat | 🚀 **Instant-Start** custom Docker containers |
+
+---
+
+## 🏗️ Architecture Blueprint
+
+### High-Level Flow
+
+The system operates on an **Orchestrator Pattern**. The Agent is the brain, deciding *when* to speak and *when* to work.
+
+```mermaid
+graph TD
+    User-->|Message| Agent
+    
+    subgraph "Orchestrator Core"
+        Agent[🤖 Agent Controller]
+        Memory[💾 Conversation Memory]
+        Planner[🧠 Decision Engine]
+    end
+    
+    Agent <--> Memory
+    Agent --> Planner
+    
+    Planner -->|Reasoning| Gemini[✨ Google Gemini API]
+    Planner -->|Need Action| Executor[🛠️ Tool Executor]
+    
+    Executor -->|Code| E2B[📦 E2B Cloud Sandbox]
+    Executor -->|Files| Storage[📂 Local/Cloud Storage]
+    
+    E2B -->|Result| Executor
+    Executor -->|Output| Agent
+    Agent -->|Final Response| User
 ```
-orchestrator/
-├── core/
-│   ├── agent.py          # Main agent class
-│   ├── conversation.py   # Conversation management
-│   └── memory.py         # Memory store
-├── providers/
-│   ├── gemini.py        # Google Gemini integration
-│   └── e2b.py           # E2B sandbox provider
-├── tools/
-│   ├── base.py          # Tool interface
-│   ├── registry.py      # Tool registry
-│   ├── executor.py      # Tool execution
-│   └── implementations.py # Built-in tools
-└── utils/
-    ├── logging.py       # Logging utilities
-    ├── retry.py         # Retry logic
-    └── streaming.py     # Streaming support
+
+### Sequence of Operations
+
+1.  **Input**: User asks "Analyze this dataset."
+2.  **Reasoning**: Gemini generates Python code.
+3.  **Execution**: Code is sent to a pre-warmed E2B sandbox.
+4.  **Result**: Sandbox returns stdout/stderr/charts.
+5.  **Response**: Agent interprets the result and explains it to the user.
+
+---
+
+## ⚡ Power Under the Hood: Custom Sandboxes
+
+We don't use generic containers. We use **Specialized Data Science Runtime** (`en7sb4k1n268scs49jnj`).
+
+```mermaid
+sequenceDiagram
+    participant Agent
+    participant E2B Cloud
+    participant Sandbox Container
+
+    Note right of Agent: User sends request
+    Agent->>E2B Cloud: Request Sandbox (Template: en7sb4k1n268...)
+    E2B Cloud->>Sandbox Container: 🚀 Boot Application (milliseconds)
+    Note over Sandbox Container: Pre-loaded: NumPy, Pandas, Sklearn
+    
+    Agent->>Sandbox Container: Execute Code
+    Sandbox Container-->>Agent: Returns Result
 ```
 
-## Quick Start
+---
 
-### 1. Install Dependencies
+## 🚀 Quick Start Guide
+
+### 1. Requirements
+*   Python 3.10 or higher
+*   `pip` or `uv` (recommended)
+*   **API Keys**:
+    *   [Google AI Studio](https://aistudio.google.com) (Gemini)
+    *   [E2B Dashboard](https://e2b.dev) (Sandboxes)
+
+### 2. Installation
 
 ```bash
-# Using uv pip (recommended)
-uv pip install -r requirements.txt
+# Clone and enter
+git clone <repo-url>
+cd sandbox-system
 
-# Or using the setup script
-./setup.sh
+# Install dependencies (fastest way)
+uv pip install -r requirements.txt
 ```
 
-### 2. Get API Keys
+### 3. Configuration
 
-**Gemini API Key** (FREE):
-- Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
-- Sign in and create an API key
-- Gemini is free for moderate usage
-
-**E2B API Key**:
-- Visit [E2B](https://e2b.dev)
-- Sign up and get your API key
-
-### 3. Configure Environment
+Create your environment file:
 
 ```bash
 cp .env.example .env
-# Edit .env and add your keys:
-# GEMINI_API_KEY=your_gemini_key_here
-# E2B_API_KEY=your_e2b_key_here
 ```
 
-### 4. Verify Installation
-
-```bash
-make verify
-# or: python scripts/verify.py
+**Edit `.env`**:
+```ini
+GEMINI_API_KEY=AIzaSy...
+E2B_API_KEY=e2b_...
+# LOG_LEVEL=INFO  (Optional)
 ```
 
-All checks should pass. If any fail, ensure dependencies are installed.
-
-### 5. Run Example
+### 4. Launch
 
 ```bash
-# Interactive conversation
 python main.py
-
-# Run predefined tasks
-python main.py tasks
 ```
 
-## Example Usage
+---
 
-```python
-from orchestrator.core.agent import Agent, AgentConfig
-from orchestrator.providers.gemini import GeminiProvider
-from orchestrator.providers.e2b import E2BProvider
-from orchestrator.tools.executor import ToolExecutor
+## 📂 Project Structure
 
-# Configure agent
-config = AgentConfig(
-    name="MyAgent",
-    model="gemini-2.0-flash-exp",
-    tools_enabled=True,
-    system_prompt="You are a helpful assistant..."
-)
-
-# Initialize providers
-llm = GeminiProvider()
-e2b = E2BProvider()
-tools = ToolExecutor(e2b)
-
-# Create agent
-agent = Agent(config, llm, tools)
-
-# Run
-response = await agent.run(
-    message="Analyze data.csv and create a visualization",
-    session_id="session-123"
-)
-
-print(response.content)
-```
-
-See [docs/e2b_guide.md](docs/e2b_guide.md) for E2B setup and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for system design.
-
-## Quick Commands
-
-```bash
-make run              # Start conversational agent
-make verify           # Verify all imports
-make map              # Generate connection map
-make list-models      # List available Gemini models
-make cleanup-sandboxes # Clean up E2B sandboxes
-make clean            # Clean Python cache files
-```
-
-## Project Structure
+A clean, modular codebase designed for extensibility.
 
 ```
 sandbox-system/
-├── main.py                     # Main conversational agent
-├── scripts/                    # Utility scripts
-│   ├── cleanup_sandboxes.py   # E2B sandbox cleanup
-│   ├── list_models.py         # List Gemini models
-│   ├── verify.py              # Import verification
-│   ├── map_connections.py     # Connection mapper
-│   ├── build_e2b_template.sh  # Build custom E2B templates
-│   └── custom_template.py     # Test custom templates
-├── docs/                       # Documentation
-│   ├── ARCHITECTURE.md         # System architecture
-│   ├── e2b_guide.md           # E2B integration basics
-│   └── E2B_CUSTOM_TEMPLATES.md # Custom Docker template guide
-├── orchestrator/              # Core system
-│   ├── core/                  # Agent engine
-│   ├── providers/             # Gemini + E2B providers
-│   │   ├── gemini.py
-│   │   └── e2b.py
-│   ├── tools/                 # Tool execution
-│   └── utils/                 # Utilities
-├── registry/tools/            # Tool definitions (YAML)
-├── storage/                   # Persistent storage
-├── Dockerfile                 # Custom sandbox image
-├── e2b.toml                   # E2B template config
-├── requirements.txt           # Dependencies
-├── pyproject.toml            # Package config
-├── Makefile                  # Quick commands
-└── .env                      # API keys (not committed)
+├── main.py                     # 🏁 Entry Point
+├── orchestrator/               # 🧠 Brains of the operation
+│   ├── core/                   # Agent logic, memory, planning
+│   ├── providers/              # External API wrappers (Gemini, E2B)
+│   ├── tools/                  # Tool definitions & execution
+│   └── utils/                  # Reusable helpers (logging, retry)
+├── registry/                   # 📋 Configuration
+│   └── tools/                  # YAML definitions for tools
+├── storage/                    # 💾 Persistent data (sessions)
+├── docs/                       # 📚 Detailed Documentation
+└── scripts/                    # 🔧 Maintenance scripts
 ```
 
-## Documentation
+---
 
-- **[E2B_CUSTOM_TEMPLATES.md](docs/E2B_CUSTOM_TEMPLATES.md)** - 🚀 Build custom Docker templates
-- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design and architecture
-- **[e2b_guide.md](docs/e2b_guide.md)** - E2B integration and usage
+## 🛠️ Management & Utilities
 
-## Custom Docker Images 🐳
+| Task | Command | Description |
+| :--- | :--- | :--- |
+| **Start Agent** | `python main.py` | Launches the interactive CLI chat. |
+| **Cleanup** | `python scripts/cleanup_sandboxes.py` | Kills all active E2B sandboxes to save cost. |
+| **Verify** | `python scripts/verify.py` | Checks imports and configuration health. |
+| **Map System** | `python scripts/map_connections.py` | Generates a visualization of system components. |
 
-Build custom E2B sandboxes with pre-installed dependencies:
+---
 
-**Current Template ID**: `en7sb4k1n268scs49jnj`
+## 📚 Reference Documentation
 
-Pre-installed packages:
-- numpy (1.26.4), pandas (2.2.3), scikit-learn (1.6.1), matplotlib (3.10.3)
-- requests, beautifulsoup4
+*   **[System Architecture](docs/ARCHITECTURE.md)**: Deep dive into the code modules.
+*   **[Project Overview](docs/PROJECT_OVERVIEW.md)**: High-level summary "for humans".
+*   **[E2B Integration Guide](docs/e2b_guide.md)**: How the sandbox provider works.
 
-**Build Your Own**:
-```bash
-# Edit Dockerfile, then build with the start command (CRITICAL!)
-e2b template build -c "/root/.jupyter/start-up.sh"
-```
+---
 
-Read the complete guide: [E2B_CUSTOM_TEMPLATES.md](docs/E2B_CUSTOM_TEMPLATES.md)
+## 🤝 Contribution
 
-## Migration
+Running into issues?
 
-This system was migrated to Google Gemini. All code has been updated:
-- ✅ Full Gemini API integration (google-genai>=1.0.0)
-- ✅ E2B Code Interpreter 1.0.0
-- ✅ Tool calling and function execution
-- ✅ Sandbox lifecycle management
-- ✅ Production-ready error handling
-- ✅ Custom Docker image support
+1.  **Check Logs**: Look at `logs/` directory for detailed execution traces.
+2.  **Verify Keys**: Ensure `.env` is loaded (the script will warn you if not).
+3.  **Rebuild**: If code fails inside sandbox, check if you need to rebuild the template (see docs).
+
+*Built with ❤️ using Gemini 2.0 and E2B.*

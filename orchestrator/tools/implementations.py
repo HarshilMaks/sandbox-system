@@ -2,7 +2,6 @@
 from typing import Dict, Any
 from orchestrator.tools.base import BaseTool
 from orchestrator.providers.e2b import E2BProvider
-import json
 
 
 class CodeExecutionTool(BaseTool):

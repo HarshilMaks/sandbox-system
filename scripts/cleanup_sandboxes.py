@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Cleanup all E2B sandboxes."""
 import os
-import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -54,7 +53,7 @@ def cleanup_all_sandboxes():
                         print(f"  Killing {sandbox_id}...")
                         sandbox = Sandbox(sandbox_id=sandbox_id, api_key=api_key)
                         sandbox.kill()
-                        print(f"    ✓ Killed")
+                        print("    ✓ Killed")
                     except Exception as e:
                         print(f"    ✗ Error: {e}")
                 
@@ -76,7 +75,7 @@ def cleanup_all_sandboxes():
                     print(f"  Killing {sandbox_id}...")
                     sandbox = Sandbox(sandbox_id=sandbox_id, api_key=api_key)
                     sandbox.kill()
-                    print(f"    ✓ Killed")
+                    print("    ✓ Killed")
                 except Exception as e:
                     print(f"    ✗ Error: {e}")
             

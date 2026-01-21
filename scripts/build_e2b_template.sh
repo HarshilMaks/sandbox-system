@@ -53,7 +53,7 @@ fi
 
 # Test the built image
 echo -e "${YELLOW}🧪 Testing built image...${NC}"
-docker run --rm sandbox-system-test:latest python -c "import numpy; print(f'NumPy: {numpy.__version__}')"
+docker run --rm sandbox-system:latest python -c "import numpy; print(f'NumPy: {numpy.__version__}')"
 echo -e "${GREEN}✓ Image test passed${NC}"
 
 # Ask user if they want to publish
@@ -90,5 +90,5 @@ fi
 
 # Cleanup test image
 echo -e "${YELLOW}🧹 Cleaning up...${NC}"
-docker rmi sandbox-system-test:latest 2>/dev/null || true
+docker rmi sandbox-system:latest 2>/dev/null || true
 echo -e "${GREEN}✓ Done!${NC}"

@@ -5,7 +5,6 @@ This demonstrates how to use your custom Docker image with E2B sandboxes.
 """
 
 import os
-import sys
 from pathlib import Path
 from e2b_code_interpreter import Sandbox
 

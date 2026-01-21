@@ -37,7 +37,7 @@ class BaseTool(ABC):
     
     @abstractmethod
     def get_schema(self) -> Dict:
-        """Get OpenAI function calling schema.
+        """Get Gemini function calling schema.
         
         Returns:
             Tool schema for function calling

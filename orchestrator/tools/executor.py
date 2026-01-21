@@ -1,5 +1,4 @@
 """Tool executor with E2B integration."""
-import json
 from typing import Dict, Any, List
 from orchestrator.tools.registry import ToolRegistry
 from orchestrator.tools.implementations import (

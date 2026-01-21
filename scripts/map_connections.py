@@ -5,7 +5,7 @@ Generate a visual connection map of all imports in the system.
 import ast
 import sys
 from pathlib import Path
-from typing import Dict, Set, List
+from typing import Dict, Set
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
