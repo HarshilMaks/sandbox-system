@@ -6,7 +6,7 @@ memory persistence, and pluggable LLM providers.
 
 Typical usage:
 
-    from orchestrator import Agent, AgentConfig, GeminiProvider, E2BProvider
+    from orchestrator import Agent, AgentConfig, GeminiProvider, E2BProvider, ToolExecutor
 
     config = AgentConfig(name="my-agent", system_prompt="You are helpful")
     agent = Agent(
