@@ -3,17 +3,22 @@ name = "sandbox-system"
 version = "1.0.0"
 description = "AI Agent System with Gemini and E2B Sandboxes"
 readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "HarshilMaks", email = "harshilmaks@users.noreply.github.com" },
+]
 requires-python = ">=3.10"
 dependencies = [
     "google-genai>=1.0.0",
     "e2b-code-interpreter==1.0.0",
     "python-dotenv==1.0.0",
-    "pyyaml==6.0.1",
+    "aiohttp>=3.9.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.4.0",
+    "pytest-asyncio>=0.23.0",
     "ruff>=0.1.0",
 ]
 

@@ -82,3 +82,6 @@ Thumbs.db
 
 # Data volumes
 volumes/
+
+# Generated artifacts (charts, images from sandbox execution)
+output/

@@ -1,7 +1,6 @@
 """Tests for Gemini and E2B providers."""
 import pytest
-from unittest.mock import MagicMock, patch, AsyncMock
-import json
+from unittest.mock import MagicMock, patch
 
 
 class TestGeminiProvider:

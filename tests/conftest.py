@@ -2,9 +2,7 @@
 import sys
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from pathlib import Path
 import tempfile
-import json
 
 from unittest.mock import MagicMock as _Mock
 import types as _types_mod

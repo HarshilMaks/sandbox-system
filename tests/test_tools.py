@@ -1,7 +1,6 @@
 """Tests for tool system."""
 import pytest
-from unittest.mock import MagicMock, patch
-import json
+from unittest.mock import MagicMock
 
 from orchestrator.tools.base import BaseTool
 from orchestrator.tools.implementations import (
@@ -116,13 +115,19 @@ class TestWebSearchTool:
         schema = tool.get_schema()
         assert schema["function"]["name"] == "web_search"
         assert "query" in schema["function"]["parameters"]["properties"]
+        assert "max_results" in schema["function"]["parameters"]["properties"]
 
-    async def test_execute_returns_placeholder(self, tool):
-        result = await tool.execute(session_id="s1", query="test query")
-        assert result["success"] is True
-        assert result["query"] == "test query"
-        assert len(result["results"]) > 0
-        assert "placeholder" in result["results"][0]["snippet"].lower()
+    async def test_execute_returns_results(self, tool):
+        result = await tool.execute(session_id="s1", query="python programming")
+        assert "query" in result
+        assert result["query"] == "python programming"
+        assert "results" in result
+
+    async def test_execute_fallback_on_error(self, tool):
+        tool._session = None
+        del tool._session
+        result = await tool.execute(session_id="s1", query="")
+        assert "results" in result
 
 
 class TestDataAnalysisTool:
@@ -186,9 +191,6 @@ class TestToolRegistry:
         schemas = registry.get_schemas()
         assert len(schemas) == 1
         assert schemas[0]["function"]["name"] == "web_search"
-
-    def test_get_definition_nonexistent(self, registry):
-        assert registry.get_definition("nope") is None
 
     def test_duplicate_register_overwrites(self, registry):
         t1 = WebSearchTool()

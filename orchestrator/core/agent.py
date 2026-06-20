@@ -31,6 +31,7 @@ class AgentResponse:
     """Agent response."""
     content: str
     tool_calls: List[Dict] = field(default_factory=list)
+    artifacts: List[Dict] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
     usage: Optional[Dict] = None
     timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
@@ -104,6 +105,7 @@ class Agent:
         # Execute agent loop
         iteration = 0
         content = ""
+        all_artifacts = []
         while iteration < self.config.max_iterations:
             iteration += 1
             
@@ -137,6 +139,10 @@ class Agent:
                         arguments=json.loads(tool_call["function"]["arguments"])
                     )
                     
+                    # Collect artifacts from tool results
+                    if result.get("artifacts"):
+                        all_artifacts.extend(result["artifacts"])
+                    
                     # Add tool result to messages
                     messages.append({
                         "role": "tool",
@@ -164,6 +170,7 @@ class Agent:
         return AgentResponse(
             content=content,
             tool_calls=response.get("tool_calls", []),
+            artifacts=all_artifacts,
             metadata={"iterations": iteration},
             usage=response.get("usage")
         )

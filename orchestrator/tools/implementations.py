@@ -1,5 +1,6 @@
 """Built-in tool implementations."""
 from typing import Dict, Any
+import aiohttp
 from orchestrator.tools.base import BaseTool
 from orchestrator.providers.e2b import E2BProvider
 
@@ -132,28 +133,80 @@ class FileOperationsTool(BaseTool):
 
 
 class WebSearchTool(BaseTool):
-    """Web search tool (placeholder)."""
+    """Search the web using DuckDuckGo's free instant answer API (no API key needed)."""
     
     def __init__(self):
         super().__init__(
             name="web_search",
-            description="Search the web for information"
+            description="Search the web for current information, news, and data"
         )
+        self._session = None
     
-    async def execute(self, session_id: str, query: str, **kwargs) -> Dict[str, Any]:
-        """Execute web search."""
-        # Placeholder - would integrate with search API in production
-        return {
-            "success": True,
-            "results": [
-                {
-                    "title": f"Search result for: {query}",
-                    "snippet": "This is a placeholder. Integrate with real search API.",
-                    "url": "https://example.com"
-                }
-            ],
-            "query": query
-        }
+    def _get_session(self):
+        if not hasattr(self, "_session") or self._session is None:
+            self._session = aiohttp.ClientSession()
+        return self._session
+    
+    async def execute(self, session_id: str, query: str, max_results: int = 5, **kwargs) -> Dict[str, Any]:
+        """Search the web using DuckDuckGo.
+        
+        Args:
+            session_id: Session identifier
+            query: Search query
+            max_results: Maximum number of results (default: 5)
+        """
+        session = self._get_session()
+        results = []
+        
+        try:
+            params = {"q": query, "format": "json", "no_html": "1", "skip_disambig": "1"}
+            async with session.get(
+                "https://api.duckduckgo.com/",
+                params=params,
+                timeout=aiohttp.ClientTimeout(total=10)
+            ) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    abstract = data.get("AbstractText", "")
+                    abstract_src = data.get("AbstractSource", "")
+                    abstract_url = data.get("AbstractURL", "")
+                    
+                    if abstract:
+                        results.append({
+                            "title": abstract_src or "DuckDuckGo Result",
+                            "snippet": abstract[:500],
+                            "url": abstract_url
+                        })
+                    
+                    for topic in data.get("RelatedTopics", []):
+                        if "Text" in topic and "FirstURL" in topic:
+                            results.append({
+                                "title": topic.get("Text", "").split(" - ")[0],
+                                "snippet": topic.get("Text", "")[:500],
+                                "url": topic.get("FirstURL", "")
+                            })
+                            if len(results) >= max_results:
+                                break
+                
+                if not results:
+                    results.append({
+                        "title": "No results found",
+                        "snippet": f"No DuckDuckGo results for: {query}",
+                        "url": ""
+                    })
+        except Exception as e:
+            results.append({
+                "title": "Search error",
+                "snippet": f"Web search failed: {e}",
+                "url": ""
+            })
+        
+        return {"success": bool(results), "results": results, "query": query}
+    
+    async def close(self):
+        if self._session:
+            await self._session.close()
+            self._session = None
     
     def get_schema(self) -> Dict:
         return {
@@ -167,6 +220,10 @@ class WebSearchTool(BaseTool):
                         "query": {
                             "type": "string",
                             "description": "Search query"
+                        },
+                        "max_results": {
+                            "type": "integer",
+                            "description": "Maximum number of results (default: 5)"
                         }
                     },
                     "required": ["query"]

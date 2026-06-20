@@ -14,19 +14,14 @@ from orchestrator.utils.logging import get_logger
 class ToolExecutor:
     """Executes tools with proper error handling and logging."""
     
-    def __init__(
-        self,
-        e2b_provider: E2BProvider,
-        registry_path: str = "./registry/tools"
-    ):
+    def __init__(self, e2b_provider: E2BProvider):
         """Initialize tool executor.
         
         Args:
             e2b_provider: E2B provider for code execution
-            registry_path: Path to tool registry
         """
         self.e2b = e2b_provider
-        self.registry = ToolRegistry(registry_path)
+        self.registry = ToolRegistry()
         self.logger = get_logger("tools.executor")
         
         # Register built-in tools

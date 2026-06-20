@@ -7,8 +7,8 @@ google-genai>=1.0.0
 # Environment Variables
 python-dotenv==1.0.0
 
-# Configuration
-pyyaml==6.0.1
+# Web search (DuckDuckGo API)
+aiohttp>=3.9.0
 
 # Development Tools
 pytest>=7.4.0

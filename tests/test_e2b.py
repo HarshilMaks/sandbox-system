@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 class TestE2BProvider:
     @pytest.fixture
     def provider(self):
-        with patch("orchestrator.providers.e2b.Sandbox") as mock_sandbox:
+        with patch("orchestrator.providers.e2b.Sandbox"):
             from orchestrator.providers.e2b import E2BProvider
             provider = E2BProvider(api_key="test-key")
             provider.sandboxes = {}

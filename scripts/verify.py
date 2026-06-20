@@ -46,7 +46,6 @@ def main():
         # Utils
         ("orchestrator.utils.logging", "Utils: Logging"),
         ("orchestrator.utils.retry", "Utils: Retry Logic"),
-        ("orchestrator.utils.streaming", "Utils: Streaming"),
         
         # Examples
         ("main", "Main: Agent Runner"),

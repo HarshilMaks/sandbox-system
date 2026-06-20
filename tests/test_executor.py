@@ -13,7 +13,7 @@ class TestToolExecutor:
             mock_registry = MagicMock()
             mock_registry_cls.return_value = mock_registry
 
-            executor = ToolExecutor(mock_e2b_provider, registry_path="./registry/tools")
+            executor = ToolExecutor(mock_e2b_provider)
             executor.registry = mock_registry
             yield executor
 
@@ -62,7 +62,7 @@ class TestToolExecutor:
             mock_registry = MagicMock()
             mock_registry_cls.return_value = mock_registry
 
-            executor = ToolExecutor(mock_e2b_provider, registry_path="./registry/tools")
+            ToolExecutor(mock_e2b_provider)
             expected_tools = {"execute_code", "file_operations", "web_search", "analyze_data"}
             registered_names = {call.args[0].name for call in mock_registry.register.call_args_list}
             assert registered_names == expected_tools

@@ -1,7 +1,7 @@
 """Tests for Agent and AgentConfig."""
 import pytest
 from datetime import datetime, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 from orchestrator.core.agent import Agent, AgentConfig, AgentResponse
 from orchestrator.core.memory import MemoryStore
