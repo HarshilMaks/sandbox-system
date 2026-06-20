@@ -20,6 +20,10 @@ class GeminiProvider:
             model: Gemini model name (or use GEMINI_MODEL env var)
         """
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
+        if not self.api_key:
+            raise ValueError(
+                "Gemini API key is required. Set GEMINI_API_KEY env var or pass api_key."
+            )
         self.model = model or os.getenv("GEMINI_MODEL", "gemini-2.0-flash-exp")
         self.client = genai.Client(api_key=self.api_key)
         self.logger = get_logger("provider.gemini")
@@ -48,9 +52,7 @@ class GeminiProvider:
         Returns:
             Response dict with content, tool_calls, usage
         """
-        # Use instance model if not provided
         model = model or self.model
-        
         self.logger.info(f"Chat completion: model={model}, messages={len(messages)}")
         
         # Convert tools to Gemini format
@@ -67,13 +69,28 @@ class GeminiProvider:
         if gemini_tools:
             config_params["tools"] = gemini_tools
         
+        # Extract system instruction and filter it from contents
+        system_instruction = None
+        filtered = []
+        for msg in messages:
+            if msg["role"] == "system":
+                system_instruction = msg["content"]
+            else:
+                filtered.append(msg)
+        
+        if system_instruction:
+            config_params["system_instruction"] = system_instruction
+        
         config = GenerateContentConfig(**config_params)
+        
+        # Convert messages to Gemini format
+        contents = self._convert_messages(filtered)
         
         # Generate response
         try:
             response = self.client.models.generate_content(
                 model=model,
-                contents=messages[-1]["content"],
+                contents=contents,
                 config=config
             )
             
@@ -153,40 +170,45 @@ class GeminiProvider:
         """Convert OpenAI message format to Gemini format.
         
         Args:
-            messages: OpenAI format messages
+            messages: OpenAI format messages (system messages pre-filtered)
             
         Returns:
-            Gemini format messages
+            Gemini format contents list
         """
-        gemini_messages = []
+        contents = []
         
         for msg in messages:
             role = msg["role"]
-            content = msg.get("content", "")
             
-            # Skip system messages - Gemini handles them differently
-            if role == "system":
-                continue
-            
-            # Map roles
-            if role == "assistant":
-                gemini_role = "model"
-            elif role == "user":
-                gemini_role = "user"
+            if role == "user":
+                contents.append({
+                    "role": "user",
+                    "parts": [{"text": msg.get("content", "")}]
+                })
+            elif role == "assistant":
+                parts = []
+                if msg.get("content"):
+                    parts.append({"text": msg["content"]})
+                if msg.get("tool_calls"):
+                    for tc in msg["tool_calls"]:
+                        parts.append({
+                            "function_call": {
+                                "name": tc["function"]["name"],
+                                "args": json.loads(tc["function"]["arguments"])
+                            }
+                        })
+                if parts:
+                    contents.append({
+                        "role": "model",
+                        "parts": parts
+                    })
             elif role == "tool":
-                # Tool results go back as user messages
-                gemini_role = "user"
-                content = f"Tool result: {content}"
-            else:
-                continue
-            
-            if content:
-                gemini_messages.append({
-                    "role": gemini_role,
-                    "parts": [{"text": content}]
+                contents.append({
+                    "role": "user",
+                    "parts": [{"text": f"Tool result: {msg.get('content', '')}"}]
                 })
         
-        return gemini_messages
+        return contents
     
     def _convert_tools(self, tools: List[Dict]) -> List:
         """Convert OpenAI tools format to Gemini format.
@@ -215,16 +237,3 @@ class GeminiProvider:
                 function_declarations.append(fd)
         
         return Tool(function_declarations=function_declarations) if function_declarations else None
-    
-    def count_tokens(self, text: str, model: str = "gemini-2.0-flash-exp") -> int:
-        """Estimate token count for text.
-        
-        Args:
-            text: Text to count
-            model: Model name
-            
-        Returns:
-            Token count
-        """
-        # Rough estimate: 1 token ≈ 4 characters
-        return len(text) // 4

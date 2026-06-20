@@ -1,6 +1,6 @@
 """Conversation management with history and context."""
 from typing import List, Dict, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from orchestrator.core.memory import MemoryStore
 
 
@@ -17,6 +17,15 @@ class ConversationManager:
         self.memory = memory_store
         self.max_history = max_history
     
+    def _validate_session_id(self, session_id: str):
+        """Validate session ID to prevent path traversal.
+        
+        Raises:
+            ValueError: If session ID contains dangerous patterns
+        """
+        if not session_id or ".." in session_id or "/" in session_id:
+            raise ValueError(f"Invalid session_id: {session_id!r}")
+    
     async def get_messages(self, session_id: str) -> List[Dict]:
         """Get conversation messages for session.
         
@@ -26,6 +35,7 @@ class ConversationManager:
         Returns:
             List of messages in OpenAI format
         """
+        self._validate_session_id(session_id)
         history = await self.memory.get(f"conversation:{session_id}", [])
         
         # Return last N messages
@@ -46,10 +56,11 @@ class ConversationManager:
             content: Message content
             metadata: Additional metadata
         """
+        self._validate_session_id(session_id)
         message = {
             "role": role,
             "content": content,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "metadata": metadata or {}
         }
         
@@ -63,15 +74,8 @@ class ConversationManager:
         await self.memory.set(f"conversation:{session_id}", history)
     
     async def get_context(self, session_id: str, window: int = 5) -> str:
-        """Get recent conversation context as string.
-        
-        Args:
-            session_id: Session identifier
-            window: Number of recent messages to include
-            
-        Returns:
-            Formatted context string
-        """
+        """Get recent conversation context as string."""
+        self._validate_session_id(session_id)
         messages = await self.get_messages(session_id)
         recent = messages[-window:]
         
@@ -85,6 +89,7 @@ class ConversationManager:
     
     async def clear_session(self, session_id: str):
         """Clear conversation history for session."""
+        self._validate_session_id(session_id)
         await self.memory.delete(f"conversation:{session_id}")
     
     async def get_summary(self, session_id: str) -> Dict:

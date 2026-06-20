@@ -71,9 +71,13 @@ class FileOperationsTool(BaseTool):
         """Execute file operation."""
         if operation == "read":
             data = self.e2b.read_file(session_id, path)
+            try:
+                text = data.decode('utf-8')
+            except UnicodeDecodeError:
+                text = f"<binary data, {len(data)} bytes>"
             return {
                 "success": True,
-                "content": data.decode('utf-8'),
+                "content": text,
                 "path": path
             }
         
@@ -244,7 +248,7 @@ print("Visualization saved to /tmp/visualization.png")
                         },
                         "analysis_type": {
                             "type": "string",
-                            "enum": ["summary", "visualize", "correlate"],
+                            "enum": ["summary", "visualize"],
                             "description": "Type of analysis to perform"
                         }
                     },

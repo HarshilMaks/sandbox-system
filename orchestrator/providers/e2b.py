@@ -17,6 +17,8 @@ class E2BProvider:
             api_key: E2B API key (or use E2B_API_KEY env var)
         """
         self.api_key = api_key or os.getenv("E2B_API_KEY")
+        if not self.api_key:
+            raise ValueError("E2B API key is required. Set E2B_API_KEY env var or pass api_key.")
         self.logger = get_logger("provider.e2b")
         self.sandboxes: Dict[str, Sandbox] = {}
     

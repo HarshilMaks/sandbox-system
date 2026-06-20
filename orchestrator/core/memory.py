@@ -1,8 +1,9 @@
 """Memory and context storage for agents."""
 import json
+import base64
 from typing import Any, Optional, Dict
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 class MemoryStore:
@@ -33,7 +34,7 @@ class MemoryStore:
             Stored value or default
         """
         # Check TTL
-        if key in self.ttl and datetime.utcnow() > self.ttl[key]:
+        if key in self.ttl and datetime.now(timezone.utc) > self.ttl[key]:
             await self.delete(key)
             return default
         
@@ -55,7 +56,7 @@ class MemoryStore:
         self.cache[key] = value
         
         if ttl_seconds:
-            self.ttl[key] = datetime.utcnow() + timedelta(seconds=ttl_seconds)
+            self.ttl[key] = datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)
         
         if self.storage_dir:
             await self._persist_to_disk(key, value)
@@ -101,8 +102,8 @@ class MemoryStore:
                 file.unlink()
     
     def _safe_key(self, key: str) -> str:
-        """Convert key to safe filename."""
-        return key.replace(":", "_").replace("/", "_").replace(" ", "_")
+        """Convert key to a safe, collision-free filename using base64."""
+        return base64.urlsafe_b64encode(key.encode()).decode().rstrip("=")
     
     def _load_from_disk(self):
         """Load persisted memory from disk."""
@@ -113,9 +114,13 @@ class MemoryStore:
             try:
                 with open(file, 'r') as f:
                     data = json.load(f)
-                    # Restore original key from filename
-                    key = file.stem.replace("_", ":")
-                    self.cache[key] = data
+                # Decode key from filename (pad for base64)
+                stem = file.stem
+                padding = 4 - len(stem) % 4
+                if padding != 4:
+                    stem += "=" * padding
+                key = base64.urlsafe_b64decode(stem).decode()
+                self.cache[key] = data
             except Exception:
                 pass  # Skip corrupted files
     
@@ -134,30 +139,39 @@ class MemoryStore:
             print(f"Failed to persist {key}: {e}")
 
 
-class VectorMemory:
-    """Vector-based semantic memory (placeholder for future embedding support)."""
+class KeywordMemory:
+    """Keyword-based semantic memory (simple in-memory search without embeddings).
+    
+    Performs basic keyword matching on stored documents. For production use,
+    replace with a proper vector database and embedding model.
+    """
     
     def __init__(self):
-        """Initialize vector memory."""
+        """Initialize keyword memory."""
         self.documents = []
     
     async def add(self, text: str, metadata: Optional[Dict] = None):
-        """Add document to vector memory."""
+        """Add document to keyword memory."""
         self.documents.append({
             "text": text,
             "metadata": metadata or {},
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         })
     
     async def search(self, query: str, limit: int = 5) -> list:
-        """Search for similar documents.
+        """Search for documents by keyword matching.
         
-        Note: This is a placeholder. In production, use embeddings.
+        Args:
+            query: Search query
+            limit: Maximum results to return
+            
+        Returns:
+            List of matching documents
         """
-        # Simple keyword search for now
+        query_terms = query.lower().split()
         results = []
         for doc in self.documents:
-            if any(word.lower() in doc["text"].lower() for word in query.split()):
+            if any(term in doc["text"].lower() for term in query_terms):
                 results.append(doc)
                 if len(results) >= limit:
                     break

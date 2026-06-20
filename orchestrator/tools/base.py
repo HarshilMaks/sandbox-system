@@ -1,16 +1,6 @@
 """Base tool interface."""
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
-from dataclasses import dataclass
-
-
-@dataclass
-class ToolDefinition:
-    """Tool definition for function calling."""
-    name: str
-    description: str
-    parameters: Dict
-    examples: Optional[list] = None
+from typing import Dict, Any
 
 
 class BaseTool(ABC):

@@ -1,7 +1,7 @@
 """Core agent framework for production AI systems."""
 from typing import Dict, List, Any, Optional, AsyncIterator
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 
 from orchestrator.core.conversation import ConversationManager
@@ -33,7 +33,7 @@ class AgentResponse:
     tool_calls: List[Dict] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
     usage: Optional[Dict] = None
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class Agent:
@@ -86,8 +86,8 @@ class Agent:
         # Load conversation history
         messages = await self.conversation.get_messages(session_id)
         
-        # Add system prompt
-        if self.config.system_prompt and not messages:
+        # Always insert system prompt (provider extracts it for Gemini)
+        if self.config.system_prompt:
             messages.insert(0, {
                 "role": "system",
                 "content": self.config.system_prompt
@@ -103,6 +103,7 @@ class Agent:
         
         # Execute agent loop
         iteration = 0
+        content = ""
         while iteration < self.config.max_iterations:
             iteration += 1
             
@@ -111,16 +112,18 @@ class Agent:
                 messages=messages,
                 model=self.config.model,
                 temperature=self.config.temperature,
+                max_tokens=self.config.max_tokens,
                 tools=tools,
                 stream=self.config.streaming
             )
             
+            content = response.get("content") or ""
+            
             # Add assistant message
-            messages.append({
-                "role": "assistant",
-                "content": response["content"],
-                "tool_calls": response.get("tool_calls")
-            })
+            msg = {"role": "assistant", "content": content}
+            if response.get("tool_calls"):
+                msg["tool_calls"] = response["tool_calls"]
+            messages.append(msg)
             
             # Check for tool calls
             if response.get("tool_calls"):
@@ -141,23 +144,25 @@ class Agent:
                         "content": json.dumps(result)
                     })
             else:
-                # No more tool calls, done
                 break
         
-        # Save conversation
+        # Save user message to conversation history
         await self.conversation.add_message(
             session_id=session_id,
             role="user",
             content=message
         )
-        await self.conversation.add_message(
-            session_id=session_id,
-            role="assistant",
-            content=response["content"]
-        )
+        
+        # Save assistant response (skip empty tool-only responses)
+        if content or response.get("tool_calls"):
+            await self.conversation.add_message(
+                session_id=session_id,
+                role="assistant",
+                content=content
+            )
         
         return AgentResponse(
-            content=response["content"],
+            content=content,
             tool_calls=response.get("tool_calls", []),
             metadata={"iterations": iteration},
             usage=response.get("usage")
@@ -179,7 +184,7 @@ class Agent:
         """
         messages = await self.conversation.get_messages(session_id)
         
-        if self.config.system_prompt and not messages:
+        if self.config.system_prompt:
             messages.insert(0, {
                 "role": "system",
                 "content": self.config.system_prompt
