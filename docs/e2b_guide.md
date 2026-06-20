@@ -20,7 +20,7 @@
 
 3. **Install Dependencies**
    ```bash
-   pip install e2b-code-interpreter
+   uv pip install e2b-code-interpreter
    ```
 
 ## Quick Usage

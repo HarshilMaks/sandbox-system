@@ -154,3 +154,9 @@ class E2BProvider:
         """Close all sandboxes."""
         for session_id in list(self.sandboxes.keys()):
             self.close_sandbox(session_id)
+    
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, *args):
+        self.cleanup_all()

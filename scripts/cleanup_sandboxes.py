@@ -63,7 +63,7 @@ def cleanup_all_sandboxes():
                 print(f"Response: {response.text}")
                 
         except ImportError:
-            print("⚠️  'requests' module not found. Install with: pip install requests")
+            print("⚠️  'requests' module not found. Install with: uv pip install requests")
             print("Falling back to manual cleanup (enter sandbox IDs below)")
             
             while True:

@@ -209,3 +209,10 @@ class Agent:
         """Reset session conversation history."""
         await self.conversation.clear_session(session_id)
         self.logger.info(f"Reset session: {session_id}")
+    
+    async def __aenter__(self):
+        return self
+    
+    async def __aexit__(self, *args):
+        if self.tools and hasattr(self.tools, "e2b_provider") and self.tools.e2b_provider:
+            self.tools.e2b_provider.cleanup_all()

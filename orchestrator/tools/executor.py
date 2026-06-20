@@ -14,25 +14,27 @@ from orchestrator.utils.logging import get_logger
 class ToolExecutor:
     """Executes tools with proper error handling and logging."""
     
-    def __init__(self, e2b_provider: E2BProvider):
+    def __init__(self, e2b_provider: E2BProvider, registry: ToolRegistry | None = None):
         """Initialize tool executor.
         
         Args:
             e2b_provider: E2B provider for code execution
+            registry: Optional custom tool registry (default: built-in tools only)
         """
-        self.e2b = e2b_provider
-        self.registry = ToolRegistry()
+        self.e2b_provider = e2b_provider
+        self.registry = registry or ToolRegistry()
         self.logger = get_logger("tools.executor")
         
-        # Register built-in tools
-        self._register_builtin_tools()
+        # Register built-in tools unless custom registry provided
+        if registry is None:
+            self._register_builtin_tools()
     
     def _register_builtin_tools(self):
         """Register built-in tool implementations."""
-        self.registry.register(CodeExecutionTool(self.e2b))
-        self.registry.register(FileOperationsTool(self.e2b))
+        self.registry.register(CodeExecutionTool(self.e2b_provider))
+        self.registry.register(FileOperationsTool(self.e2b_provider))
         self.registry.register(WebSearchTool())
-        self.registry.register(DataAnalysisTool(self.e2b))
+        self.registry.register(DataAnalysisTool(self.e2b_provider))
     
     async def execute(
         self,
